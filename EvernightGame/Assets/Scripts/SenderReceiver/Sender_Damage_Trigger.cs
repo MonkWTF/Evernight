@@ -13,7 +13,10 @@ public class Sender_Damage_Trigger : MonoBehaviour {
 		{
 			return;
 		}
-		
+
+		print (other.gameObject.tag);
+		print (gameObject.tag);
+
 		//set damage amount based on tag of this object
 		//
 		//					-- IMPORTANT --
