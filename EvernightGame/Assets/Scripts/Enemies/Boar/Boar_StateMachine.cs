@@ -11,7 +11,7 @@ public class Boar_StateMachine : MonoBehaviour {
 	public CircleCollider2D aggroThreshold;
 	public BoxCollider2D borderCollider;
 	public Rigidbody2D rb2d;
-
+	
 	void Awake()
 	{
 		//stop rigidbody from rotating
@@ -26,7 +26,16 @@ public class Boar_StateMachine : MonoBehaviour {
 
 		//init stats sheet for boar, give stats sheet to receiver
 		stats = new Stats_Enemy(7);
-		//GetComponent<Receiver_Damage>().setStatsEnemy (stats);
+		GetComponent<Receiver_Damage>().setStatsEnemy (stats);
+
+		//subscribe to stats' death event
+		Stats_Enemy.onDeath += handleOnDeath;
+	}
+
+	void handleOnDeath()
+	{
+		Stats_Enemy.onDeath -= handleOnDeath;
+		Destroy(gameObject);
 	}
 
 	//enter aggro threshold

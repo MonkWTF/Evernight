@@ -14,9 +14,29 @@ public class characterController : MonoBehaviour {
 	private bool isFacingRight;
 	private bool grounded;
 	//GameObject lantern; 
+
+	//JUSTIN
+	public Rigidbody2D rb2d;
 	
+	private Stats_Player stats;
+	private Vector3 checkPoint = Vector3.zero;
+	//JUSTIN
+
+	//JUSTIN
+	void handleOnDeath()
+	{
+		Stats_Player.onDeath -= handleOnDeath;
+		respawn();
+	}
 	
-	
+	void respawn()
+	{
+		Stats_Player.onDeath += handleOnDeath;
+		stats.changeHealth(stats.getMaxHealth());
+		transform.position = checkPoint;
+	}
+	//JUSTIN
+
 	// Use this for initialization
 	void Awake(){
 		isFacingRight = true; 
@@ -24,6 +44,21 @@ public class characterController : MonoBehaviour {
 		//lightPosition = lantern.GetComponent<Transform> ();
 		//lightMovement = lantern.transform.position.x;
 		//lightPosition = lightMovement.position.x;
+
+		//JUSTIN
+		//constrain rotation
+		rb2d.fixedAngle = true;
+
+		//init stats
+		stats = new Stats_Player(10);
+		GetComponent<Receiver_Damage>().setStatsPlayer (stats);
+		
+		//set initial spawn
+		checkPoint = transform.position;
+
+		//subscribe to death event
+		Stats_Player.onDeath += handleOnDeath;
+		//JUSTIN
 	}
 	
 	void Start () {

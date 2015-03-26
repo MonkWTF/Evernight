@@ -6,77 +6,123 @@ public class Receiver_Damage : MonoBehaviour {
 	private Stats_Enemy enemyStats;
 	private Stats_Player playerStats;
 
+	public float timeSinceLastDamage;
+	public float minTimeSinceLastDamage;
+
 	void Awake()
 	{
-		//init stats objects to null
-		//	-- state machine of parent game object passes an instance to this
+		minTimeSinceLastDamage = 1.5f;
+		timeSinceLastDamage = minTimeSinceLastDamage;
+	}
+
+	void OnDisable()
+	{
 		enemyStats = null;
 		playerStats = null;
 	}
 
+	void Update()
+	{
+		timeSinceLastDamage += Time.deltaTime;
+	}
+
 	public bool receiveDamage(int incomingDmg, string senderTag)
 	{
-		//check this object's tag
-		switch(gameObject.tag)
+		if(timeSinceLastDamage >= minTimeSinceLastDamage)
 		{
-
-		//player is receiving potential damage
-		case "Player":
-
-			//check sender object's tag to see if it can damage this entity
-			switch(senderTag)
+			//check this object's tag
+			switch(gameObject.tag)
 			{
-			//sender can damage this entity
-			case "Enemy":
-			case "Boar":
-			case "Gremlin":
-			case "Deerman":
-			//TODO -- add hazards
-				return sendDmgToPlayer(incomingDmg);
+	
+			//player is receiving damage
+			case "Player":
 
-			//sender can't damage this entity (not in list above)
+				if(checkDmgPlayer(incomingDmg, senderTag))
+				{
+					return true;
+				}
+				return false;
+
+			//enemy (of any type) is receiving damage
+			case "Enemy_Boar":
+			case "Enemy_Gremlin":
+			case "Enemy_Deerman":
+
+				if(checkDmgEnemy (incomingDmg, senderTag))
+				{
+					return true;
+				}
+				return false;
+
+			//not a valid damage receiving target
 			default:
 				return false;
 			}
+		}
 
-		//enemy (of any type) is receiving potential damage
-		case "Enemy":
-		case "Boar":
-		case "Gremlin":
-		case "Deerman":
+		return false;
+	}
 
-			//check sender object's tag to see if it can damage this entity
-			switch(senderTag)
+	private bool checkDmgPlayer(int incomingDmg, string senderTag)
+	{
+		//check sender object's tag to see if it can damage this entity
+		switch(senderTag)
+		{
+		//sender can damage this entity
+		case "Enemy_Boar":
+		case "Enemy_Gremlin":
+		case "Enemy_Deerman":
+		//TODO -- expand list
+
+			if(receiveDmgPlayer(incomingDmg))
 			{
-				//sender can damage this entity
-			case "Light":
-			//TODO -- add hazards
-				return sendDmgToEnemy (incomingDmg);
-
-				//sender can't damage this entity (not in list above)
-			default:
-				return false;
+				timeSinceLastDamage = 0.0f;
+				return true;
 			}
-
-		//not a valid damage receiving target
+			return false;
+			
+		//sender can't damage this entity (not in list above)
 		default:
 			return false;
 		}
 	}
 
-	private bool sendDmgToPlayer(int incomingDmg)
+	private bool receiveDmgPlayer(int incomingDmg)
 	{
 		//if player stats are not null, send damage
 		if(playerStats != null)
 		{
-			print(playerStats.changeHealth (incomingDmg)); //JUSTIN -- added print
+			playerStats.changeHealth (incomingDmg);
 			return true;
 		}
 
 		return false;
 	}
 
-	private bool sendDmgToEnemy(int incomingDmg)
+	private bool checkDmgEnemy(int incomingDmg, string senderTag)
+	{
+		//check sender object's tag to see if it can damage this entity
+		switch(senderTag)
+		{
+		//sender can damage this entity
+		case "Light_Lantern":
+		case "Light_Brazier":
+		//TODO -- expand list
+
+			if(receiveDmgEnemy(incomingDmg))
+			{
+				timeSinceLastDamage = 0.0f;
+				return true;
+			}
+			return false;
+			
+		//sender can't damage this entity (not in list above)
+		default:
+			return false;
+		}
+	}
+
+	private bool receiveDmgEnemy(int incomingDmg)
 	{
 		//if enemy stats are not null, send damage
 		if(enemyStats != null)

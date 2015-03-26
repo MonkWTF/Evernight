@@ -5,6 +5,10 @@ public class Stats_Player {
 
 	private int currentHealth;
 	private int maxHealth;
+	private const int minHealth = 0;
+
+	public delegate void DeathEvent();
+	public static event DeathEvent onDeath;
 	
 	public Stats_Player(int max)
 	{
@@ -17,10 +21,14 @@ public class Stats_Player {
 		//
 	}
 	
-	public int changeHealth(int adjustment)
+	public void changeHealth(int adjustment)
 	{
 		currentHealth += adjustment;
-		return currentHealth; //JUSTIN
+		if(currentHealth <= minHealth)
+		{
+			currentHealth = minHealth;
+			onDeath();
+		}
 	}
 	
 	public int getMaxHealth(){ return maxHealth; }

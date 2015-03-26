@@ -23,18 +23,14 @@ public class Sender_Damage_Collider : MonoBehaviour {
 		int dmg = 0;
 		switch(gameObject.tag)
 		{
-
-		//boar is sending damage
-		case "Boar":
+		//1pt damage sender
+		case "Enemy_Boar":
 			dmg = -1;
 			break;
 
-		//TODO -- add more cases
-
-		//this isn't a valid damage sender, send 0 damage
+		//this isn't a valid damage sender
 		default:
-			dmg = 0;
-			break;
+			return;
 		}
 
 		//send damage to the colliding entity
@@ -44,11 +40,6 @@ public class Sender_Damage_Collider : MonoBehaviour {
 	//contact is maintained
 	void OnCollisionStay2D(Collision2D other)
 	{
-		//
-	}
-	       
-	void OnCollisionExit2D(Collision2D other)
-	{
-		//
+		OnCollisionEnter2D (other);
 	}
 }
